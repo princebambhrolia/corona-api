@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORONA API</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header>
+        <h1>CORONA API </h1>
+    </header>
+
+    <div class="container">
+        <div class="search-bar">
+            <input type="text" id="country-input" placeholder="Search a country">
+            <button id="search-button" onclick="button()">SEARCH</button>
+        </div>
+        <div class="cards-container" id="cards-container"></div>
+    </div>
+
+    <script>
+        const api= 'https://disease.sh/v3/covid-19/countries';
+
+        const searchButton = document.getElementById('search-button');
+        const countryInput = document.getElementById('country-input');
+        const cardsContainer = document.getElementById('cards-container');
+
+        const fetchCountryData = async (country) => {
+            try {
+                const response = await fetch(`${api}/${country}`);
+                if (!response.ok) throw new Error('Country not found');
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                alert(error.message);
+                return null;
+            }
+        };
+
+        const createCard = (countryData) => {
+            const card = document.createElement('div');
+            card.innerHTML = `
+                <div class="main">
+                    <h3>${countryData.country}</h3>
+                    <p>Total Cases: ${countryData.cases.toLocaleString()}</p>
+                    <p>Recovered: ${countryData.recovered.toLocaleString()}</p>
+                    <p>Deaths: ${countryData.deaths.toLocaleString()}</p>
+                </div>
+            `;
+            return card;
+        };
+
+        const button = async () => {
+            const country = countryInput.value.trim();
+            if (!country) {
+                alert('Please enter a country name.');
+                return;
+            }
+
+            const data = await fetchCountryData(country);
+            if (data) {
+                cardsContainer.innerHTML = '';
+                const card = createCard(data);
+                cardsContainer.appendChild(card);
+            }
+        };
+
+        searchButton.addEventListener('click', button);
+    </script>
+</body>
+
+</html>
